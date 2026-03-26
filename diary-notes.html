@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Diary</title>
+<meta name="theme-color" content="#c9a84c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="My Diary">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%232a1a0a'/%3E%3Ctext x='96' y='130' font-size='110' text-anchor='middle'%3E📖%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f5f0e8;
+    --parchment: #ede4d0;
+    --warm-brown: #6b4c2a;
+    --dark-brown: #3d2b1a;
+    --ink: #2c1f0e;
+    --red-ribbon: #c0392b;
+    --gold: #c9a84c;
+    --shadow: rgba(60,30,10,0.18);
+    --line: rgba(100,70,30,0.13);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #2a1a0a;
+    background-image: radial-gradient(ellipse at 20% 50%, #3d2b1a 0%, #1a0f05 100%);
+    min-height: 100vh;
+    font-family: 'Lora', Georgia, serif;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 10px 40px;
+  }
+
+  /* ── Header ─────────────────────────── */
+  .app-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    color: var(--gold);
+    text-align: center;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+    text-shadow: 0 2px 12px rgba(201,168,76,0.3);
+  }
+  .app-subtitle {
+    font-family: 'Lora', serif;
+    font-size: 0.82rem;
+    color: rgba(201,168,76,0.55);
+    text-align: center;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  /* ── Layout ──────────────────────────── */
+  .container {
+    width: 100%;
+    max-width: 960px;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 0;
+    min-height: 580px;
+    border-radius: 4px 18px 18px 4px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.7), 0 2px 8px rgba(0,0,0,0.4);
+    overflow: hidden;
+  }
+
+  /* ── Sidebar (Navigator) ─────────────── */
+  .sidebar {
+    background: linear-gradient(160deg, #5a3820 0%, #3d2410 100%);
+    border-right: 3px solid var(--gold);
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .nav-section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.7;
+    margin-bottom: 6px;
+  }
+
+  /* Year selector */
+  .year-select {
+    width: 100%;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(201,168,76,0.35);
+    border-radius: 6px;
+    color: var(--gold);
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    padding: 8px 10px;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%23c9a84c'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+  }
+  .year-select option { background: #3d2410; }
+
+  /* Month grid */
+  .month-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+  }
+  .month-btn {
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 5px;
+    color: rgba(201,168,76,0.7);
+    font-family: 'Lora', serif;
+    font-size: 0.7rem;
+    padding: 6px 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .month-btn:hover { background: rgba(201,168,76,0.12); color: var(--gold); }
+  .month-btn.active { background: var(--gold); color: #3d2410; font-weight: 600; border-color: var(--gold); }
+
+  /* Day list */
+  .day-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 240px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(201,168,76,0.3) transparent;
+  }
+  .day-btn {
+    background: transparent;
+    border: none;
+    border-left: 2px solid transparent;
+    color: rgba(201,168,76,0.6);
+    font-family: 'Lora', serif;
+    font-size: 0.82rem;
+    padding: 6px 10px;
+    cursor: pointer;
+    text-align: left;
+    border-radius: 0 4px 4px 0;
+    transition: all 0.18s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .day-btn:hover { color: var(--gold); background: rgba(201,168,76,0.08); border-left-color: rgba(201,168,76,0.4); }
+  .day-btn.active { color: var(--cream); background: rgba(201,168,76,0.15); border-left-color: var(--gold); }
+  .day-btn .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0;
+    flex-shrink: 0;
+  }
+  .day-btn.has-entry .dot { opacity: 1; }
+
+  /* ── Main (Book page) ───────────────── */
+  .page {
+    background: var(--cream);
+    background-image:
+      repeating-linear-gradient(transparent, transparent 31px, var(--line) 31px, var(--line) 32px);
+    background-position: 0 56px;
+    padding: 32px 36px 32px 52px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    min-height: 580px;
+  }
+
+  /* Red margin line */
+  .page::before {
+    content: '';
+    position: absolute;
+    left: 40px; top: 0; bottom: 0;
+    width: 1.5px;
+    background: rgba(192,57,43,0.35);
+  }
+
+  /* Spiral holes */
+  .page::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 36px;
+    background:
+      radial-gradient(circle 5px at 18px 40px, #2a1a0a 100%, transparent 100%),
+      radial-gradient(circle 5px at 18px 100px, #2a1a0a 100%, transparent 100%),
+      radial-gradient(circle 5px at 18px 160px, #2a1a0a 100%, transparent 100%),
+      radial-gradient(circle 5px at 18px 220px, #2a1a0a 100%, transparent 100%),
+      radial-gradient(circle 5px at 18px 280px, #2a1a0a 100%, transparent 100%),
+      radial-gradient(circle 5px at 18px 340px, #2a1a0a 100%, transparent 100%),
+      radial-gradient(circle 5px at 18px 400px, #2a1a0a 100%, transparent 100%),
+      radial-gradient(circle 5px at 18px 460px, #2a1a0a 100%, transparent 100%),
+      radial-gradient(circle 5px at 18px 520px, #2a1a0a 100%, transparent 100%);
+  }
+
+  .page-date {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--warm-brown);
+    margin-bottom: 4px;
+    opacity: 0.85;
+  }
+  .page-weekday {
+    font-family: 'Lora', serif;
+    font-size: 0.72rem;
+    color: var(--red-ribbon);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    opacity: 0.75;
+  }
+
+  .mood-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .mood-btn {
+    background: transparent;
+    border: 1px solid rgba(107,76,42,0.25);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: var(--warm-brown);
+    font-family: 'Lora', serif;
+    transition: all 0.18s;
+  }
+  .mood-btn:hover { background: rgba(107,76,42,0.1); }
+  .mood-btn.selected { background: var(--warm-brown); color: var(--cream); border-color: var(--warm-brown); }
+
+  .entry-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    border: none;
+    border-bottom: 1.5px solid rgba(107,76,42,0.2);
+    background: transparent;
+    width: 100%;
+    color: var(--dark-brown);
+    padding: 4px 0 6px;
+    margin-bottom: 16px;
+    outline: none;
+    font-style: italic;
+  }
+  .entry-title::placeholder { color: rgba(107,76,42,0.35); }
+
+  .entry-body {
+    flex: 1;
+    font-family: 'Lora', serif;
+    font-size: 0.92rem;
+    line-height: 32px;
+    border: none;
+    background: transparent;
+    color: var(--ink);
+    width: 100%;
+    resize: none;
+    outline: none;
+    min-height: 260px;
+  }
+  .entry-body::placeholder { color: rgba(107,76,42,0.3); font-style: italic; }
+
+  .page-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 16px;
+    border-top: 1px dashed rgba(107,76,42,0.2);
+    padding-top: 14px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    font-family: 'Lora', serif;
+    font-size: 0.8rem;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.18s;
+    letter-spacing: 0.5px;
+  }
+  .btn-save {
+    background: var(--warm-brown);
+    color: var(--cream);
+  }
+  .btn-save:hover { background: var(--dark-brown); }
+  .btn-delete {
+    background: transparent;
+    border: 1px solid rgba(192,57,43,0.4);
+    color: var(--red-ribbon);
+  }
+  .btn-delete:hover { background: rgba(192,57,43,0.08); }
+
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--dark-brown);
+    color: var(--gold);
+    font-family: 'Lora', serif;
+    font-size: 0.82rem;
+    padding: 10px 24px;
+    border-radius: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.35s;
+    z-index: 100;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── Search bar ────────────────────── */
+  .search-wrap {
+    position: relative;
+  }
+  .search-input {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 6px;
+    color: rgba(201,168,76,0.9);
+    font-family: 'Lora', serif;
+    font-size: 0.78rem;
+    padding: 7px 10px 7px 30px;
+    outline: none;
+  }
+  .search-input::placeholder { color: rgba(201,168,76,0.35); }
+  .search-icon {
+    position: absolute;
+    left: 9px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8rem;
+    color: rgba(201,168,76,0.4);
+    pointer-events: none;
+  }
+
+  /* ── Responsive ─────────────────────── */
+  @media (max-width: 680px) {
+    .container {
+      grid-template-columns: 1fr;
+      border-radius: 12px;
+    }
+    .sidebar {
+      border-right: none;
+      border-bottom: 3px solid var(--gold);
+    }
+    .page { padding: 28px 20px 24px 36px; }
+    .page::before { left: 26px; }
+    .page::after { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-title">My Diary</div>
+<div class="app-subtitle">Every day, a new page</div>
+
+<div class="container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div>
+      <div class="nav-section-title">Year</div>
+      <select class="year-select" id="yearSelect"></select>
+    </div>
+
+    <div>
+      <div class="nav-section-title">Month</div>
+      <div class="month-grid" id="monthGrid"></div>
+    </div>
+
+    <div>
+      <div class="nav-section-title">Day</div>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" id="searchInput" placeholder="Search entries…" />
+      </div>
+    </div>
+
+    <div class="day-list" id="dayList"></div>
+  </div>
+
+  <!-- Page -->
+  <div class="page">
+    <div class="page-date" id="pageDate"></div>
+    <div class="page-weekday" id="pageWeekday"></div>
+
+    <div class="mood-row" id="moodRow"></div>
+
+    <input class="entry-title" id="entryTitle" placeholder="Give this day a title…" maxlength="80" />
+    <textarea class="entry-body" id="entryBody" placeholder="Dear Diary,&#10;&#10;Today was…"></textarea>
+
+    <div class="page-actions">
+      <button class="btn btn-delete" id="btnDelete">Clear</button>
+      <button class="btn btn-save" id="btnSave">Save Entry</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MOODS = ['😊 Happy','😔 Sad','😤 Frustrated','😌 Peaceful','🥳 Excited','🤔 Thoughtful','😴 Tired','❤️ Grateful'];
+
+let state = { year: new Date().getFullYear(), month: new Date().getMonth(), day: new Date().getDate() };
+
+// ── Storage helpers ─────────────────────
+function key(y,m,d) { return `diary-${y}-${m+1}-${d}`; }
+function load(y,m,d) { try { return JSON.parse(localStorage.getItem(key(y,m,d))) || {}; } catch { return {}; } }
+function save(y,m,d, data) { localStorage.setItem(key(y,m,d), JSON.stringify(data)); }
+function remove(y,m,d) { localStorage.removeItem(key(y,m,d)); }
+function hasEntry(y,m,d) { const e=load(y,m,d); return !!(e.title||e.body); }
+
+// ── UI helpers ──────────────────────────
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+function daysInMonth(y,m) { return new Date(y,m+1,0).getDate(); }
+
+// ── Build year select ───────────────────
+function buildYearSelect() {
+  const sel = document.getElementById('yearSelect');
+  sel.innerHTML = '';
+  const cur = new Date().getFullYear();
+  for(let y=cur+1; y>=cur-50; y--) {
+    const o=document.createElement('option');
+    o.value=y; o.textContent=y;
+    if(y===state.year) o.selected=true;
+    sel.appendChild(o);
+  }
+  sel.addEventListener('change', ()=>{ state.year=+sel.value; buildDayList(); renderPage(); });
+}
+
+// ── Build month grid ─────────────────────
+function buildMonthGrid() {
+  const grid = document.getElementById('monthGrid');
+  grid.innerHTML='';
+  MONTHS.forEach((m,i)=>{
+    const btn=document.createElement('button');
+    btn.className='month-btn'+(i===state.month?' active':'');
+    btn.textContent=m.slice(0,3);
+    btn.addEventListener('click',()=>{ state.month=i; state.day=1; buildMonthGrid(); buildDayList(); renderPage(); });
+    grid.appendChild(btn);
+  });
+}
+
+// ── Build day list ───────────────────────
+function buildDayList(filter='') {
+  const list = document.getElementById('dayList');
+  list.innerHTML='';
+  const total=daysInMonth(state.year,state.month);
+  for(let d=1;d<=total;d++){
+    const dt=new Date(state.year,state.month,d);
+    const wday=DAYS_SHORT[dt.getDay()];
+    const label=`${d} — ${wday}`;
+    const entry=load(state.year,state.month,d);
+    const preview=entry.title||entry.body||'';
+    if(filter && !preview.toLowerCase().includes(filter.toLowerCase()) && !label.toLowerCase().includes(filter.toLowerCase())) continue;
+    const btn=document.createElement('button');
+    btn.className='day-btn'+(d===state.day?' active':'')+(hasEntry(state.year,state.month,d)?' has-entry':'');
+    btn.innerHTML=`<span class="dot"></span>${label}`;
+    if(entry.title) btn.title=entry.title;
+    btn.addEventListener('click',()=>{ state.day=d; buildDayList(document.getElementById('searchInput').value); renderPage(); });
+    list.appendChild(btn);
+  }
+}
+
+// ── Build mood row ───────────────────────
+function buildMoodRow(selectedMood) {
+  const row=document.getElementById('moodRow');
+  row.innerHTML='';
+  MOODS.forEach(m=>{
+    const btn=document.createElement('button');
+    btn.className='mood-btn'+(m===selectedMood?' selected':'');
+    btn.textContent=m;
+    btn.addEventListener('click',()=>buildMoodRow(m===selectedMood?'':m));
+    row.appendChild(btn);
+  });
+  row._selected=selectedMood;
+}
+function getSelectedMood() {
+  const sel=document.querySelector('.mood-btn.selected');
+  return sel?sel.textContent:'';
+}
+
+// ── Render page ──────────────────────────
+function renderPage() {
+  const {year,month,day}=state;
+  const dt=new Date(year,month,day);
+  document.getElementById('pageDate').textContent=
+    `${MONTHS[month]} ${day}, ${year}`;
+  document.getElementById('pageWeekday').textContent=
+    ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][dt.getDay()];
+
+  const entry=load(year,month,day);
+  document.getElementById('entryTitle').value=entry.title||'';
+  document.getElementById('entryBody').value=entry.body||'';
+  buildMoodRow(entry.mood||'');
+}
+
+// ── Save ─────────────────────────────────
+document.getElementById('btnSave').addEventListener('click',()=>{
+  const {year,month,day}=state;
+  const title=document.getElementById('entryTitle').value.trim();
+  const body=document.getElementById('entryBody').value.trim();
+  const mood=getSelectedMood();
+  if(!title&&!body){ toast('Nothing to save yet…'); return; }
+  save(year,month,day,{title,body,mood,saved:new Date().toISOString()});
+  buildDayList(document.getElementById('searchInput').value);
+  toast('Entry saved ✒️');
+});
+
+// ── Clear ────────────────────────────────
+document.getElementById('btnDelete').addEventListener('click',()=>{
+  document.getElementById('entryTitle').value='';
+  document.getElementById('entryBody').value='';
+  buildMoodRow('');
+  remove(state.year,state.month,state.day);
+  buildDayList(document.getElementById('searchInput').value);
+  toast('Entry cleared');
+});
+
+// ── Search ───────────────────────────────
+document.getElementById('searchInput').addEventListener('input', e=>{
+  buildDayList(e.target.value);
+});
+
+// ── Auto-save on blur ────────────────────
+['entryTitle','entryBody'].forEach(id=>{
+  document.getElementById(id).addEventListener('blur',()=>{
+    const {year,month,day}=state;
+    const title=document.getElementById('entryTitle').value.trim();
+    const body=document.getElementById('entryBody').value.trim();
+    if(!title&&!body) return;
+    const mood=getSelectedMood();
+    save(year,month,day,{title,body,mood,saved:new Date().toISOString()});
+    buildDayList(document.getElementById('searchInput').value);
+  });
+});
+
+// ── Init ─────────────────────────────────
+buildYearSelect();
+buildMonthGrid();
+buildDayList();
+renderPage();
+
+// ── PWA: Register Service Worker ─────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(r => console.log('SW registered:', r.scope))
+      .catch(e => console.warn('SW failed:', e));
+  });
+}
+
+// ── PWA: Install prompt ───────────────────
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  setTimeout(() => { if (deferredPrompt) showInstallBanner(); }, 3000);
+});
+
+function showInstallBanner() {
+  if (document.getElementById('installBanner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'installBanner';
+  banner.style.cssText = [
+    'position:fixed','bottom:24px','left:50%','transform:translateX(-50%)',
+    'background:#3d2b1a','border:1.5px solid #c9a84c','border-radius:12px',
+    'padding:14px 20px','display:flex','align-items:center','gap:14px',
+    "font-family:'Lora',serif",'font-size:0.82rem','color:#f5f0e8',
+    'box-shadow:0 8px 32px rgba(0,0,0,0.5)','z-index:999','max-width:92vw'
+  ].join(';');
+  banner.innerHTML =
+    '<span style="font-size:1.4rem">📖</span>' +
+    '<span>Install <strong style="color:#c9a84c">My Diary</strong> on your device?</span>' +
+    '<button id="btnInstall" style="background:#c9a84c;border:none;border-radius:6px;' +
+    "padding:7px 14px;color:#2a1a0a;font-family:'Lora',serif;font-size:0.78rem;" +
+    'cursor:pointer;font-weight:600;">Install</button>' +
+    '<button id="btnDismiss" style="background:transparent;border:none;' +
+    'color:rgba(245,240,232,0.4);font-size:1.1rem;cursor:pointer;padding:0 4px;">✕</button>';
+  document.body.appendChild(banner);
+
+  document.getElementById('btnInstall').addEventListener('click', async () => {
+    banner.remove();
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    if (outcome === 'accepted') toast('App installed! 🎉');
+  });
+  document.getElementById('btnDismiss').addEventListener('click', () => banner.remove());
+}
+
+window.addEventListener('appinstalled', () => {
+  toast('My Diary installed! 🎉');
+  deferredPrompt = null;
+});
+</script>
+</body>
+</html>
