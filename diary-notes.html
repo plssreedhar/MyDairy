@@ -269,15 +269,13 @@ const DEFAULT_PW='diary123';
 let state={year:new Date().getFullYear(),month:new Date().getMonth(),day:new Date().getDate()};
 let searchScope='month';
 
-// ── Password system (simple & reliable) ──
-// Stores a salted string — not plaintext, not crypto-dependent
-function encodePw(pw){ return btoa(unescape(encodeURIComponent('MDsalt::'+pw+'::2024'))); }
+// ── Password system (simple & bulletproof) ──
 function getStoredPw(){ return localStorage.getItem(PW_KEY); }
 function initPw(){
-  if(!getStoredPw()) localStorage.setItem(PW_KEY, encodePw(DEFAULT_PW));
+  if(!getStoredPw()) localStorage.setItem(PW_KEY, DEFAULT_PW);
 }
-function checkPw(pw){ return encodePw(pw) === getStoredPw(); }
-function setPw(pw){ localStorage.setItem(PW_KEY, encodePw(pw)); }
+function checkPw(pw){ return pw === getStoredPw(); }
+function setPw(pw){ localStorage.setItem(PW_KEY, pw); }
 
 // Lock screen
 function showLock(){
@@ -669,12 +667,10 @@ showLock();
 // Reset password button
 document.getElementById('btnResetPw').addEventListener('click',()=>{
   if(confirm('This will reset your password to: diary123\n\nYour diary entries will NOT be deleted.\n\nContinue?')){
-    localStorage.removeItem(PW_KEY);
-    initPw();
-    document.getElementById('lockInput').value='';
+    localStorage.setItem(PW_KEY, DEFAULT_PW);
+    document.getElementById('lockInput').value='diary123';
     document.getElementById('lockError').textContent='';
-    document.getElementById('lockHint').textContent='Password reset!\nDefault password is: diary123';
-    toast('Password reset to: diary123');
+    document.getElementById('lockHint').textContent='✅ Reset done! Password is: diary123';
   }
 });
 
