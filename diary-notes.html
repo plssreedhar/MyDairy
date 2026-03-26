@@ -13,400 +13,218 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
-    --cream: #f5f0e8;
-    --parchment: #ede4d0;
-    --warm-brown: #6b4c2a;
-    --dark-brown: #3d2b1a;
-    --ink: #2c1f0e;
-    --red-ribbon: #c0392b;
-    --gold: #c9a84c;
-    --shadow: rgba(60,30,10,0.18);
-    --line: rgba(100,70,30,0.13);
+    --cream: #f5f0e8; --parchment: #ede4d0;
+    --warm-brown: #6b4c2a; --dark-brown: #3d2b1a;
+    --ink: #2c1f0e; --red-ribbon: #c0392b;
+    --gold: #c9a84c; --line: rgba(100,70,30,0.13);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     background: #2a1a0a;
     background-image: radial-gradient(ellipse at 20% 50%, #3d2b1a 0%, #1a0f05 100%);
-    min-height: 100vh;
-    font-family: 'Lora', Georgia, serif;
-    color: var(--ink);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px 10px 40px;
+    min-height: 100vh; font-family: 'Lora', Georgia, serif;
+    color: var(--ink); display: flex; flex-direction: column;
+    align-items: center; padding: 20px 10px 40px;
   }
 
-  /* ── Header ─────────────────────────── */
-  .app-title {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-size: clamp(2rem, 6vw, 3.2rem);
-    color: var(--gold);
-    text-align: center;
-    letter-spacing: 2px;
-    margin-bottom: 6px;
-    text-shadow: 0 2px 12px rgba(201,168,76,0.3);
+  /* ── Lock Screen ── */
+  #lockScreen {
+    position: fixed; inset: 0; background: #1a0f05;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 9999; gap: 16px; padding: 24px;
   }
-  .app-subtitle {
-    font-family: 'Lora', serif;
-    font-size: 0.82rem;
-    color: rgba(201,168,76,0.55);
-    text-align: center;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    margin-bottom: 28px;
+  .lock-icon { font-size: 3.5rem; }
+  .lock-title { font-family:'Playfair Display',serif; font-style:italic; font-size:2rem; color:var(--gold); letter-spacing:2px; }
+  .lock-sub { font-size:0.78rem; color:rgba(201,168,76,0.4); letter-spacing:3px; text-transform:uppercase; }
+  .lock-input {
+    background:rgba(255,255,255,0.06); border:1.5px solid rgba(201,168,76,0.4);
+    border-radius:8px; color:var(--gold); font-family:'Lora',serif;
+    font-size:1.1rem; padding:12px 18px; outline:none;
+    width:100%; max-width:300px; text-align:center; letter-spacing:4px;
+    transition: border-color 0.2s;
   }
+  .lock-input::placeholder { letter-spacing:1px; color:rgba(201,168,76,0.3); font-size:0.85rem; }
+  .lock-input:focus { border-color: var(--gold); }
+  .lock-btn {
+    background:var(--gold); border:none; border-radius:8px;
+    color:#2a1a0a; font-family:'Playfair Display',serif;
+    font-size:0.95rem; font-weight:600; padding:12px 36px;
+    cursor:pointer; letter-spacing:1px; transition:all 0.2s;
+    width:100%; max-width:300px;
+  }
+  .lock-btn:hover { background:#e0bc5a; }
+  .lock-error { color:var(--red-ribbon); font-size:0.78rem; min-height:18px; letter-spacing:0.5px; }
+  .lock-hint { font-size:0.72rem; color:rgba(201,168,76,0.35); text-align:center; max-width:280px; line-height:1.7; white-space:pre-line; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)} }
+  .shake { animation: shake 0.4s ease; }
 
-  /* ── Layout ──────────────────────────── */
-  .container {
-    width: 100%;
-    max-width: 960px;
-    display: grid;
-    grid-template-columns: 280px 1fr;
-    gap: 0;
-    min-height: 580px;
-    border-radius: 4px 18px 18px 4px;
-    box-shadow: 0 24px 80px rgba(0,0,0,0.7), 0 2px 8px rgba(0,0,0,0.4);
-    overflow: hidden;
-  }
+  /* ── Header ── */
+  .app-header { display:flex; align-items:center; justify-content:center; gap:14px; width:100%; max-width:960px; margin-bottom:6px; position:relative; }
+  .app-title { font-family:'Playfair Display',serif; font-style:italic; font-size:clamp(2rem,6vw,3.2rem); color:var(--gold); text-align:center; letter-spacing:2px; text-shadow:0 2px 12px rgba(201,168,76,0.3); }
+  .btn-lock-app { position:absolute; right:0; background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3); border-radius:8px; color:var(--gold); font-size:1.1rem; width:38px; height:38px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+  .btn-lock-app:hover { background:rgba(201,168,76,0.22); }
+  .app-subtitle { font-family:'Lora',serif; font-size:0.82rem; color:rgba(201,168,76,0.55); text-align:center; letter-spacing:4px; text-transform:uppercase; margin-bottom:28px; }
 
-  /* ── Sidebar (Navigator) ─────────────── */
-  .sidebar {
-    background: linear-gradient(160deg, #5a3820 0%, #3d2410 100%);
-    border-right: 3px solid var(--gold);
-    padding: 24px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
+  /* ── Layout ── */
+  .container { width:100%; max-width:960px; display:grid; grid-template-columns:280px 1fr; gap:0; min-height:580px; border-radius:4px 18px 18px 4px; box-shadow:0 24px 80px rgba(0,0,0,0.7),0 2px 8px rgba(0,0,0,0.4); overflow:hidden; }
 
-  .nav-section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 0.7rem;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--gold);
-    opacity: 0.7;
-    margin-bottom: 6px;
-  }
+  /* ── Sidebar ── */
+  .sidebar { background:linear-gradient(160deg,#5a3820 0%,#3d2410 100%); border-right:3px solid var(--gold); padding:24px 16px; display:flex; flex-direction:column; gap:20px; }
+  .nav-section-title { font-family:'Playfair Display',serif; font-size:0.7rem; letter-spacing:3px; text-transform:uppercase; color:var(--gold); opacity:0.7; margin-bottom:6px; }
+  .year-select { width:100%; background:rgba(255,255,255,0.07); border:1px solid rgba(201,168,76,0.35); border-radius:6px; color:var(--gold); font-family:'Playfair Display',serif; font-size:1.1rem; padding:8px 10px; outline:none; cursor:pointer; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%23c9a84c'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; }
+  .year-select option { background:#3d2410; }
+  .month-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; }
+  .month-btn { background:transparent; border:1px solid rgba(201,168,76,0.2); border-radius:5px; color:rgba(201,168,76,0.7); font-family:'Lora',serif; font-size:0.7rem; padding:6px 2px; cursor:pointer; transition:all 0.2s; text-align:center; }
+  .month-btn:hover { background:rgba(201,168,76,0.12); color:var(--gold); }
+  .month-btn.active { background:var(--gold); color:#3d2410; font-weight:600; border-color:var(--gold); }
 
-  /* Year selector */
-  .year-select {
-    width: 100%;
-    background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(201,168,76,0.35);
-    border-radius: 6px;
-    color: var(--gold);
-    font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
-    padding: 8px 10px;
-    outline: none;
-    cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%23c9a84c'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-  }
-  .year-select option { background: #3d2410; }
-
-  /* Month grid */
-  .month-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 5px;
-  }
-  .month-btn {
-    background: transparent;
-    border: 1px solid rgba(201,168,76,0.2);
-    border-radius: 5px;
-    color: rgba(201,168,76,0.7);
-    font-family: 'Lora', serif;
-    font-size: 0.7rem;
-    padding: 6px 2px;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: center;
-  }
-  .month-btn:hover { background: rgba(201,168,76,0.12); color: var(--gold); }
-  .month-btn.active { background: var(--gold); color: #3d2410; font-weight: 600; border-color: var(--gold); }
+  /* Search */
+  .search-wrap { position:relative; }
+  .search-input { width:100%; background:rgba(255,255,255,0.06); border:1px solid rgba(201,168,76,0.25); border-radius:6px; color:rgba(201,168,76,0.9); font-family:'Lora',serif; font-size:0.78rem; padding:7px 10px 7px 30px; outline:none; transition:border 0.2s; }
+  .search-input:focus { border-color:rgba(201,168,76,0.6); }
+  .search-input::placeholder { color:rgba(201,168,76,0.35); }
+  .search-icon { position:absolute; left:9px; top:50%; transform:translateY(-50%); font-size:0.8rem; color:rgba(201,168,76,0.4); pointer-events:none; }
+  .search-scope { display:flex; gap:5px; margin-top:6px; }
+  .scope-btn { flex:1; background:transparent; border:1px solid rgba(201,168,76,0.2); border-radius:4px; color:rgba(201,168,76,0.5); font-family:'Lora',serif; font-size:0.65rem; padding:4px 2px; cursor:pointer; transition:all 0.18s; text-align:center; }
+  .scope-btn.active { background:rgba(201,168,76,0.2); color:var(--gold); border-color:rgba(201,168,76,0.5); }
+  #searchResults { display:none; flex-direction:column; gap:5px; max-height:220px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:rgba(201,168,76,0.3) transparent; }
+  .search-result-item { background:rgba(255,255,255,0.04); border:1px solid rgba(201,168,76,0.15); border-radius:5px; padding:7px 10px; cursor:pointer; transition:all 0.18s; }
+  .search-result-item:hover { background:rgba(201,168,76,0.1); border-color:rgba(201,168,76,0.35); }
+  .result-date { font-size:0.68rem; color:var(--gold); opacity:0.8; margin-bottom:2px; }
+  .result-title { font-size:0.78rem; color:rgba(245,240,232,0.85); font-family:'Playfair Display',serif; font-style:italic; }
+  .result-snippet { font-size:0.68rem; color:rgba(245,240,232,0.45); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .result-snippet mark,.result-title mark { background:rgba(201,168,76,0.35); color:var(--gold); border-radius:2px; padding:0 1px; }
+  .search-empty { font-size:0.75rem; color:rgba(201,168,76,0.35); text-align:center; padding:12px 0; font-style:italic; }
 
   /* Day list */
-  .day-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    max-height: 240px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(201,168,76,0.3) transparent;
-  }
-  .day-btn {
-    background: transparent;
-    border: none;
-    border-left: 2px solid transparent;
-    color: rgba(201,168,76,0.6);
-    font-family: 'Lora', serif;
-    font-size: 0.82rem;
-    padding: 6px 10px;
-    cursor: pointer;
-    text-align: left;
-    border-radius: 0 4px 4px 0;
-    transition: all 0.18s;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .day-btn:hover { color: var(--gold); background: rgba(201,168,76,0.08); border-left-color: rgba(201,168,76,0.4); }
-  .day-btn.active { color: var(--cream); background: rgba(201,168,76,0.15); border-left-color: var(--gold); }
-  .day-btn .dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--gold);
-    opacity: 0;
-    flex-shrink: 0;
-  }
-  .day-btn.has-entry .dot { opacity: 1; }
+  .day-list { display:flex; flex-direction:column; gap:4px; max-height:240px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:rgba(201,168,76,0.3) transparent; }
+  .day-btn { background:transparent; border:none; border-left:2px solid transparent; color:rgba(201,168,76,0.6); font-family:'Lora',serif; font-size:0.82rem; padding:6px 10px; cursor:pointer; text-align:left; border-radius:0 4px 4px 0; transition:all 0.18s; display:flex; align-items:center; gap:8px; }
+  .day-btn:hover { color:var(--gold); background:rgba(201,168,76,0.08); border-left-color:rgba(201,168,76,0.4); }
+  .day-btn.active { color:var(--cream); background:rgba(201,168,76,0.15); border-left-color:var(--gold); }
+  .day-btn .dot { width:6px; height:6px; border-radius:50%; background:var(--gold); opacity:0; flex-shrink:0; }
+  .day-btn.has-entry .dot { opacity:1; }
 
-  /* ── Main (Book page) ───────────────── */
-  .page {
-    background: var(--cream);
-    background-image:
-      repeating-linear-gradient(transparent, transparent 31px, var(--line) 31px, var(--line) 32px);
-    background-position: 0 56px;
-    padding: 32px 36px 32px 52px;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    min-height: 580px;
-  }
+  /* ── Page ── */
+  .page { background:var(--cream); background-image:repeating-linear-gradient(transparent,transparent 31px,var(--line) 31px,var(--line) 32px); background-position:0 56px; padding:32px 36px 32px 52px; display:flex; flex-direction:column; position:relative; min-height:580px; }
+  .page::before { content:''; position:absolute; left:40px; top:0; bottom:0; width:1.5px; background:rgba(192,57,43,0.35); }
+  .page::after { content:''; position:absolute; left:0; top:0; bottom:0; width:36px; background:radial-gradient(circle 5px at 18px 40px,#2a1a0a 100%,transparent 100%),radial-gradient(circle 5px at 18px 100px,#2a1a0a 100%,transparent 100%),radial-gradient(circle 5px at 18px 160px,#2a1a0a 100%,transparent 100%),radial-gradient(circle 5px at 18px 220px,#2a1a0a 100%,transparent 100%),radial-gradient(circle 5px at 18px 280px,#2a1a0a 100%,transparent 100%),radial-gradient(circle 5px at 18px 340px,#2a1a0a 100%,transparent 100%),radial-gradient(circle 5px at 18px 400px,#2a1a0a 100%,transparent 100%),radial-gradient(circle 5px at 18px 460px,#2a1a0a 100%,transparent 100%),radial-gradient(circle 5px at 18px 520px,#2a1a0a 100%,transparent 100%); }
+  .page-date { font-family:'Playfair Display',serif; font-style:italic; font-size:1.15rem; color:var(--warm-brown); margin-bottom:4px; opacity:0.85; }
+  .page-weekday { font-family:'Lora',serif; font-size:0.72rem; color:var(--red-ribbon); letter-spacing:3px; text-transform:uppercase; margin-bottom:18px; opacity:0.75; }
+  .mood-row { display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
+  .mood-btn { background:transparent; border:1px solid rgba(107,76,42,0.25); border-radius:20px; padding:4px 12px; font-size:0.8rem; cursor:pointer; color:var(--warm-brown); font-family:'Lora',serif; transition:all 0.18s; }
+  .mood-btn:hover { background:rgba(107,76,42,0.1); }
+  .mood-btn.selected { background:var(--warm-brown); color:var(--cream); border-color:var(--warm-brown); }
+  .entry-title { font-family:'Playfair Display',serif; font-size:1rem; border:none; border-bottom:1.5px solid rgba(107,76,42,0.2); background:transparent; width:100%; color:var(--dark-brown); padding:4px 0 6px; margin-bottom:16px; outline:none; font-style:italic; }
+  .entry-title::placeholder { color:rgba(107,76,42,0.35); }
+  .entry-body { flex:1; font-family:'Lora',serif; font-size:0.92rem; line-height:32px; border:none; background:transparent; color:var(--ink); width:100%; resize:none; outline:none; min-height:260px; }
+  .entry-body::placeholder { color:rgba(107,76,42,0.3); font-style:italic; }
+  .page-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:16px; border-top:1px dashed rgba(107,76,42,0.2); padding-top:14px; flex-wrap:wrap; }
+  .btn { font-family:'Lora',serif; font-size:0.8rem; padding:8px 20px; border-radius:4px; cursor:pointer; border:none; transition:all 0.18s; letter-spacing:0.5px; }
+  .btn-save { background:var(--warm-brown); color:var(--cream); }
+  .btn-save:hover { background:var(--dark-brown); }
+  .btn-delete { background:transparent; border:1px solid rgba(192,57,43,0.4); color:var(--red-ribbon); }
+  .btn-delete:hover { background:rgba(192,57,43,0.08); }
 
-  /* Red margin line */
-  .page::before {
-    content: '';
-    position: absolute;
-    left: 40px; top: 0; bottom: 0;
-    width: 1.5px;
-    background: rgba(192,57,43,0.35);
-  }
+  /* Toast */
+  .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--dark-brown); color:var(--gold); font-family:'Lora',serif; font-size:0.82rem; padding:10px 24px; border-radius:20px; opacity:0; pointer-events:none; transition:all 0.35s; z-index:100; white-space:nowrap; }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-  /* Spiral holes */
-  .page::after {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 36px;
-    background:
-      radial-gradient(circle 5px at 18px 40px, #2a1a0a 100%, transparent 100%),
-      radial-gradient(circle 5px at 18px 100px, #2a1a0a 100%, transparent 100%),
-      radial-gradient(circle 5px at 18px 160px, #2a1a0a 100%, transparent 100%),
-      radial-gradient(circle 5px at 18px 220px, #2a1a0a 100%, transparent 100%),
-      radial-gradient(circle 5px at 18px 280px, #2a1a0a 100%, transparent 100%),
-      radial-gradient(circle 5px at 18px 340px, #2a1a0a 100%, transparent 100%),
-      radial-gradient(circle 5px at 18px 400px, #2a1a0a 100%, transparent 100%),
-      radial-gradient(circle 5px at 18px 460px, #2a1a0a 100%, transparent 100%),
-      radial-gradient(circle 5px at 18px 520px, #2a1a0a 100%, transparent 100%);
-  }
+  /* Change Password Modal */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:888; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:#3d2b1a; border:1.5px solid var(--gold); border-radius:14px; padding:28px 28px 22px; width:90%; max-width:340px; display:flex; flex-direction:column; gap:14px; }
+  .modal-title { font-family:'Playfair Display',serif; font-style:italic; color:var(--gold); font-size:1.2rem; }
+  .modal-input { background:rgba(255,255,255,0.07); border:1px solid rgba(201,168,76,0.35); border-radius:6px; color:var(--gold); font-family:'Lora',serif; font-size:0.9rem; padding:10px 14px; outline:none; width:100%; }
+  .modal-input::placeholder { color:rgba(201,168,76,0.3); }
+  .modal-actions { display:flex; gap:10px; justify-content:flex-end; }
+  .modal-btn { font-family:'Lora',serif; font-size:0.8rem; padding:8px 18px; border-radius:6px; cursor:pointer; border:none; }
+  .modal-btn-cancel { background:transparent; border:1px solid rgba(201,168,76,0.3); color:rgba(201,168,76,0.6); }
+  .modal-btn-save { background:var(--gold); color:#2a1a0a; font-weight:600; }
+  .modal-err { color:var(--red-ribbon); font-size:0.75rem; min-height:16px; }
 
-  .page-date {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-size: 1.15rem;
-    color: var(--warm-brown);
-    margin-bottom: 4px;
-    opacity: 0.85;
-  }
-  .page-weekday {
-    font-family: 'Lora', serif;
-    font-size: 0.72rem;
-    color: var(--red-ribbon);
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    margin-bottom: 18px;
-    opacity: 0.75;
-  }
-
-  .mood-row {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 18px;
-    flex-wrap: wrap;
-  }
-  .mood-btn {
-    background: transparent;
-    border: 1px solid rgba(107,76,42,0.25);
-    border-radius: 20px;
-    padding: 4px 12px;
-    font-size: 0.8rem;
-    cursor: pointer;
-    color: var(--warm-brown);
-    font-family: 'Lora', serif;
-    transition: all 0.18s;
-  }
-  .mood-btn:hover { background: rgba(107,76,42,0.1); }
-  .mood-btn.selected { background: var(--warm-brown); color: var(--cream); border-color: var(--warm-brown); }
-
-  .entry-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1rem;
-    border: none;
-    border-bottom: 1.5px solid rgba(107,76,42,0.2);
-    background: transparent;
-    width: 100%;
-    color: var(--dark-brown);
-    padding: 4px 0 6px;
-    margin-bottom: 16px;
-    outline: none;
-    font-style: italic;
-  }
-  .entry-title::placeholder { color: rgba(107,76,42,0.35); }
-
-  .entry-body {
-    flex: 1;
-    font-family: 'Lora', serif;
-    font-size: 0.92rem;
-    line-height: 32px;
-    border: none;
-    background: transparent;
-    color: var(--ink);
-    width: 100%;
-    resize: none;
-    outline: none;
-    min-height: 260px;
-  }
-  .entry-body::placeholder { color: rgba(107,76,42,0.3); font-style: italic; }
-
-  .page-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    margin-top: 16px;
-    border-top: 1px dashed rgba(107,76,42,0.2);
-    padding-top: 14px;
-    flex-wrap: wrap;
-  }
-
-  .btn {
-    font-family: 'Lora', serif;
-    font-size: 0.8rem;
-    padding: 8px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    border: none;
-    transition: all 0.18s;
-    letter-spacing: 0.5px;
-  }
-  .btn-save {
-    background: var(--warm-brown);
-    color: var(--cream);
-  }
-  .btn-save:hover { background: var(--dark-brown); }
-  .btn-delete {
-    background: transparent;
-    border: 1px solid rgba(192,57,43,0.4);
-    color: var(--red-ribbon);
-  }
-  .btn-delete:hover { background: rgba(192,57,43,0.08); }
-
-  .toast {
-    position: fixed;
-    bottom: 28px;
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--dark-brown);
-    color: var(--gold);
-    font-family: 'Lora', serif;
-    font-size: 0.82rem;
-    padding: 10px 24px;
-    border-radius: 20px;
-    opacity: 0;
-    pointer-events: none;
-    transition: all 0.35s;
-    z-index: 100;
-    white-space: nowrap;
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  /* ── Search bar ────────────────────── */
-  .search-wrap {
-    position: relative;
-  }
-  .search-input {
-    width: 100%;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(201,168,76,0.25);
-    border-radius: 6px;
-    color: rgba(201,168,76,0.9);
-    font-family: 'Lora', serif;
-    font-size: 0.78rem;
-    padding: 7px 10px 7px 30px;
-    outline: none;
-  }
-  .search-input::placeholder { color: rgba(201,168,76,0.35); }
-  .search-icon {
-    position: absolute;
-    left: 9px; top: 50%;
-    transform: translateY(-50%);
-    font-size: 0.8rem;
-    color: rgba(201,168,76,0.4);
-    pointer-events: none;
-  }
-
-  /* ── Responsive ─────────────────────── */
-  @media (max-width: 680px) {
-    .container {
-      grid-template-columns: 1fr;
-      border-radius: 12px;
-    }
-    .sidebar {
-      border-right: none;
-      border-bottom: 3px solid var(--gold);
-    }
-    .page { padding: 28px 20px 24px 36px; }
-    .page::before { left: 26px; }
-    .page::after { display: none; }
+  /* Responsive */
+  @media (max-width:680px) {
+    .container { grid-template-columns:1fr; border-radius:12px; }
+    .sidebar { border-right:none; border-bottom:3px solid var(--gold); }
+    .page { padding:28px 20px 24px 36px; }
+    .page::before { left:26px; }
+    .page::after { display:none; }
   }
 </style>
 </head>
 <body>
 
-<div class="app-title">My Diary</div>
+<!-- Lock Screen -->
+<div id="lockScreen">
+  <div class="lock-icon">🔒</div>
+  <div class="lock-title">My Diary</div>
+  <div class="lock-sub">Private &amp; Secure</div>
+  <input class="lock-input" type="password" id="lockInput" placeholder="Enter your password" maxlength="32" />
+  <div class="lock-error" id="lockError"></div>
+  <button class="lock-btn" id="lockSubmit">Open Diary</button>
+  <div class="lock-hint" id="lockHint"></div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal-overlay" id="pwModal">
+  <div class="modal">
+    <div class="modal-title">🔑 Change Password</div>
+    <input class="modal-input" type="password" id="pwOld" placeholder="Current password" />
+    <input class="modal-input" type="password" id="pwNew" placeholder="New password (min 4 chars)" />
+    <input class="modal-input" type="password" id="pwConfirm" placeholder="Confirm new password" />
+    <div class="modal-err" id="pwErr"></div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" id="pwCancel">Cancel</button>
+      <button class="modal-btn modal-btn-save" id="pwSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- App -->
+<div class="app-header">
+  <div class="app-title">My Diary</div>
+  <button class="btn-lock-app" id="btnLockApp" title="Lock diary">🔒</button>
+</div>
 <div class="app-subtitle">Every day, a new page</div>
 
 <div class="container">
-  <!-- Sidebar -->
   <div class="sidebar">
     <div>
       <div class="nav-section-title">Year</div>
       <select class="year-select" id="yearSelect"></select>
     </div>
-
     <div>
       <div class="nav-section-title">Month</div>
       <div class="month-grid" id="monthGrid"></div>
     </div>
-
     <div>
-      <div class="nav-section-title">Day</div>
+      <div class="nav-section-title">Search Entries</div>
       <div class="search-wrap">
         <span class="search-icon">🔍</span>
-        <input class="search-input" id="searchInput" placeholder="Search entries…" />
+        <input class="search-input" id="searchInput" placeholder="Search by keyword…" />
       </div>
+      <div class="search-scope">
+        <button class="scope-btn active" id="scopeMonth">This Month</button>
+        <button class="scope-btn" id="scopeAll">All Time</button>
+      </div>
+      <div id="searchResults"></div>
     </div>
-
-    <div class="day-list" id="dayList"></div>
+    <div>
+      <div class="nav-section-title">Day</div>
+      <div class="day-list" id="dayList"></div>
+    </div>
+    <div style="margin-top:auto;padding-top:10px;border-top:1px solid rgba(201,168,76,0.15)">
+      <button id="btnChangePw" style="background:transparent;border:1px solid rgba(201,168,76,0.25);border-radius:6px;color:rgba(201,168,76,0.55);font-family:'Lora',serif;font-size:0.72rem;padding:7px 12px;cursor:pointer;width:100%;transition:all 0.2s">🔑 Change Password</button>
+    </div>
   </div>
 
-  <!-- Page -->
   <div class="page">
     <div class="page-date" id="pageDate"></div>
     <div class="page-weekday" id="pageWeekday"></div>
-
     <div class="mood-row" id="moodRow"></div>
-
     <input class="entry-title" id="entryTitle" placeholder="Give this day a title…" maxlength="80" />
     <textarea class="entry-body" id="entryBody" placeholder="Dear Diary,&#10;&#10;Today was…"></textarea>
-
     <div class="page-actions">
       <button class="btn btn-delete" id="btnDelete">Clear</button>
       <button class="btn btn-save" id="btnSave">Save Entry</button>
@@ -417,208 +235,280 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-const MOODS = ['😊 Happy','😔 Sad','😤 Frustrated','😌 Peaceful','🥳 Excited','🤔 Thoughtful','😴 Tired','❤️ Grateful'];
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS_SHORT=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MOODS=['😊 Happy','😔 Sad','😤 Frustrated','😌 Peaceful','🥳 Excited','🤔 Thoughtful','😴 Tired','❤️ Grateful'];
+const PW_KEY='diary-password';
+const DEFAULT_PW='diary123';
 
-let state = { year: new Date().getFullYear(), month: new Date().getMonth(), day: new Date().getDate() };
+let state={year:new Date().getFullYear(),month:new Date().getMonth(),day:new Date().getDate()};
+let searchScope='month';
 
-// ── Storage helpers ─────────────────────
-function key(y,m,d) { return `diary-${y}-${m+1}-${d}`; }
-function load(y,m,d) { try { return JSON.parse(localStorage.getItem(key(y,m,d))) || {}; } catch { return {}; } }
-function save(y,m,d, data) { localStorage.setItem(key(y,m,d), JSON.stringify(data)); }
-function remove(y,m,d) { localStorage.removeItem(key(y,m,d)); }
-function hasEntry(y,m,d) { const e=load(y,m,d); return !!(e.title||e.body); }
-
-// ── UI helpers ──────────────────────────
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2200);
+// Hash password
+async function hashPw(pw){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pw+'mydiary-salt-2024'));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function getStoredHash(){return localStorage.getItem(PW_KEY);}
+async function checkPw(pw){
+  let stored=getStoredHash();
+  if(!stored){stored=await hashPw(DEFAULT_PW);localStorage.setItem(PW_KEY,stored);}
+  return (await hashPw(pw))===stored;
 }
 
-function daysInMonth(y,m) { return new Date(y,m+1,0).getDate(); }
+// Lock screen
+function showLock(){
+  const ls=document.getElementById('lockScreen');
+  ls.style.display='flex';
+  document.getElementById('lockInput').value='';
+  document.getElementById('lockError').textContent='';
+  const isFirst=!getStoredHash();
+  document.getElementById('lockHint').textContent=isFirst?'First time?\nDefault password is: diary123\n(Change it from the sidebar after login.)':'';
+  setTimeout(()=>document.getElementById('lockInput').focus(),100);
+}
+async function tryUnlock(){
+  const pw=document.getElementById('lockInput').value;
+  if(!pw){document.getElementById('lockError').textContent='Please enter your password.';return;}
+  const ok=await checkPw(pw);
+  if(ok){
+    document.getElementById('lockScreen').style.display='none';
+    document.getElementById('lockError').textContent='';
+  } else {
+    document.getElementById('lockError').textContent='❌ Wrong password. Try again.';
+    const inp=document.getElementById('lockInput');
+    inp.classList.add('shake'); inp.value='';
+    setTimeout(()=>inp.classList.remove('shake'),500);
+  }
+}
+document.getElementById('lockSubmit').addEventListener('click',tryUnlock);
+document.getElementById('lockInput').addEventListener('keydown',e=>{if(e.key==='Enter')tryUnlock();});
+document.getElementById('btnLockApp').addEventListener('click',showLock);
 
-// ── Build year select ───────────────────
-function buildYearSelect() {
-  const sel = document.getElementById('yearSelect');
-  sel.innerHTML = '';
-  const cur = new Date().getFullYear();
-  for(let y=cur+1; y>=cur-50; y--) {
+// Change password modal
+document.getElementById('btnChangePw').addEventListener('click',()=>{
+  ['pwOld','pwNew','pwConfirm'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('pwErr').textContent='';
+  document.getElementById('pwModal').classList.add('open');
+});
+document.getElementById('pwCancel').addEventListener('click',()=>document.getElementById('pwModal').classList.remove('open'));
+document.getElementById('pwSave').addEventListener('click',async()=>{
+  const old=document.getElementById('pwOld').value;
+  const nw=document.getElementById('pwNew').value;
+  const cf=document.getElementById('pwConfirm').value;
+  const err=document.getElementById('pwErr');
+  if(!old||!nw||!cf){err.textContent='Please fill in all fields.';return;}
+  if(nw.length<4){err.textContent='New password must be at least 4 characters.';return;}
+  if(nw!==cf){err.textContent='New passwords do not match.';return;}
+  if(!(await checkPw(old))){err.textContent='❌ Current password is wrong.';return;}
+  localStorage.setItem(PW_KEY,await hashPw(nw));
+  document.getElementById('pwModal').classList.remove('open');
+  toast('Password updated! 🔑');
+});
+
+// Storage
+function key(y,m,d){return `diary-${y}-${m+1}-${d}`;}
+function loadEntry(y,m,d){try{return JSON.parse(localStorage.getItem(key(y,m,d)))||{};}catch{return {};}}
+function saveEntry(y,m,d,data){localStorage.setItem(key(y,m,d),JSON.stringify(data));}
+function removeEntry(y,m,d){localStorage.removeItem(key(y,m,d));}
+function hasEntry(y,m,d){const e=loadEntry(y,m,d);return !!(e.title||e.body);}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2300);
+}
+function daysInMonth(y,m){return new Date(y,m+1,0).getDate();}
+
+// Year
+function buildYearSelect(){
+  const sel=document.getElementById('yearSelect');sel.innerHTML='';
+  const cur=new Date().getFullYear();
+  for(let y=cur+1;y>=cur-50;y--){
     const o=document.createElement('option');
-    o.value=y; o.textContent=y;
-    if(y===state.year) o.selected=true;
+    o.value=y;o.textContent=y;if(y===state.year)o.selected=true;
     sel.appendChild(o);
   }
-  sel.addEventListener('change', ()=>{ state.year=+sel.value; buildDayList(); renderPage(); });
+  sel.addEventListener('change',()=>{state.year=+sel.value;buildDayList();renderPage();});
 }
 
-// ── Build month grid ─────────────────────
-function buildMonthGrid() {
-  const grid = document.getElementById('monthGrid');
-  grid.innerHTML='';
+// Month
+function buildMonthGrid(){
+  const grid=document.getElementById('monthGrid');grid.innerHTML='';
   MONTHS.forEach((m,i)=>{
     const btn=document.createElement('button');
     btn.className='month-btn'+(i===state.month?' active':'');
     btn.textContent=m.slice(0,3);
-    btn.addEventListener('click',()=>{ state.month=i; state.day=1; buildMonthGrid(); buildDayList(); renderPage(); });
+    btn.addEventListener('click',()=>{state.month=i;state.day=1;buildMonthGrid();buildDayList();renderPage();});
     grid.appendChild(btn);
   });
 }
 
-// ── Build day list ───────────────────────
-function buildDayList(filter='') {
-  const list = document.getElementById('dayList');
-  list.innerHTML='';
+// Day list
+function buildDayList(){
+  const list=document.getElementById('dayList');list.innerHTML='';
   const total=daysInMonth(state.year,state.month);
   for(let d=1;d<=total;d++){
     const dt=new Date(state.year,state.month,d);
-    const wday=DAYS_SHORT[dt.getDay()];
-    const label=`${d} — ${wday}`;
-    const entry=load(state.year,state.month,d);
-    const preview=entry.title||entry.body||'';
-    if(filter && !preview.toLowerCase().includes(filter.toLowerCase()) && !label.toLowerCase().includes(filter.toLowerCase())) continue;
     const btn=document.createElement('button');
     btn.className='day-btn'+(d===state.day?' active':'')+(hasEntry(state.year,state.month,d)?' has-entry':'');
-    btn.innerHTML=`<span class="dot"></span>${label}`;
-    if(entry.title) btn.title=entry.title;
-    btn.addEventListener('click',()=>{ state.day=d; buildDayList(document.getElementById('searchInput').value); renderPage(); });
+    btn.innerHTML=`<span class="dot"></span>${d} — ${DAYS_SHORT[dt.getDay()]}`;
+    const e=loadEntry(state.year,state.month,d);
+    if(e.title)btn.title=e.title;
+    btn.addEventListener('click',()=>{state.day=d;buildDayList();renderPage();});
     list.appendChild(btn);
   }
 }
 
-// ── Build mood row ───────────────────────
-function buildMoodRow(selectedMood) {
-  const row=document.getElementById('moodRow');
-  row.innerHTML='';
+// Search
+function esc(t){return t.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function highlight(text,kw){
+  const safe=esc(text||'');
+  if(!kw)return safe;
+  const re=new RegExp('('+kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+  return safe.replace(re,'<mark>$1</mark>');
+}
+function doSearch(kw){
+  const panel=document.getElementById('searchResults');
+  const dayListEl=document.getElementById('dayList');
+  if(!kw.trim()){panel.style.display='none';dayListEl.style.display='flex';return;}
+  panel.style.display='flex';dayListEl.style.display='none';panel.innerHTML='';
+  const results=[];const kwLow=kw.toLowerCase();
+  if(searchScope==='month'){
+    const total=daysInMonth(state.year,state.month);
+    for(let d=1;d<=total;d++){
+      const e=loadEntry(state.year,state.month,d);
+      if((e.title||'').toLowerCase().includes(kwLow)||(e.body||'').toLowerCase().includes(kwLow))
+        results.push({y:state.year,m:state.month,d,title:e.title,body:e.body});
+    }
+  } else {
+    for(const k in localStorage){
+      if(!k.startsWith('diary-')||k===PW_KEY)continue;
+      try{
+        const e=JSON.parse(localStorage.getItem(k));
+        if(!e||(!e.title&&!e.body))continue;
+        if((e.title||'').toLowerCase().includes(kwLow)||(e.body||'').toLowerCase().includes(kwLow)){
+          const p=k.replace('diary-','').split('-');
+          results.push({y:+p[0],m:+p[1]-1,d:+p[2],title:e.title,body:e.body});
+        }
+      }catch{}
+    }
+    results.sort((a,b)=>new Date(b.y,b.m,b.d)-new Date(a.y,a.m,a.d));
+  }
+  if(!results.length){panel.innerHTML=`<div class="search-empty">No entries found for "<em>${esc(kw)}</em>"</div>`;return;}
+  results.forEach(r=>{
+    const item=document.createElement('div');
+    item.className='search-result-item';
+    const snippet=(r.body||'').replace(/\n/g,' ').slice(0,80);
+    item.innerHTML=
+      `<div class="result-date">${MONTHS[r.m]} ${r.d}, ${r.y}</div>`+
+      `<div class="result-title">${highlight(r.title||'(no title)',kw)}</div>`+
+      (snippet?`<div class="result-snippet">${highlight(snippet,kw)}…</div>`:'');
+    item.addEventListener('click',()=>{
+      state.year=r.y;state.month=r.m;state.day=r.d;
+      buildYearSelect();buildMonthGrid();buildDayList();renderPage();
+      document.getElementById('searchInput').value='';
+      panel.style.display='none';dayListEl.style.display='flex';
+    });
+    panel.appendChild(item);
+  });
+}
+document.getElementById('searchInput').addEventListener('input',e=>doSearch(e.target.value));
+document.getElementById('scopeMonth').addEventListener('click',()=>{
+  searchScope='month';
+  document.getElementById('scopeMonth').classList.add('active');
+  document.getElementById('scopeAll').classList.remove('active');
+  doSearch(document.getElementById('searchInput').value);
+});
+document.getElementById('scopeAll').addEventListener('click',()=>{
+  searchScope='all';
+  document.getElementById('scopeAll').classList.add('active');
+  document.getElementById('scopeMonth').classList.remove('active');
+  doSearch(document.getElementById('searchInput').value);
+});
+
+// Mood
+function buildMoodRow(sel){
+  const row=document.getElementById('moodRow');row.innerHTML='';
   MOODS.forEach(m=>{
     const btn=document.createElement('button');
-    btn.className='mood-btn'+(m===selectedMood?' selected':'');
+    btn.className='mood-btn'+(m===sel?' selected':'');
     btn.textContent=m;
-    btn.addEventListener('click',()=>buildMoodRow(m===selectedMood?'':m));
+    btn.addEventListener('click',()=>buildMoodRow(m===sel?'':m));
     row.appendChild(btn);
   });
-  row._selected=selectedMood;
 }
-function getSelectedMood() {
-  const sel=document.querySelector('.mood-btn.selected');
-  return sel?sel.textContent:'';
-}
+function getSelectedMood(){const s=document.querySelector('.mood-btn.selected');return s?s.textContent:'';}
 
-// ── Render page ──────────────────────────
-function renderPage() {
+// Render
+function renderPage(){
   const {year,month,day}=state;
   const dt=new Date(year,month,day);
-  document.getElementById('pageDate').textContent=
-    `${MONTHS[month]} ${day}, ${year}`;
-  document.getElementById('pageWeekday').textContent=
-    ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][dt.getDay()];
-
-  const entry=load(year,month,day);
+  document.getElementById('pageDate').textContent=`${MONTHS[month]} ${day}, ${year}`;
+  document.getElementById('pageWeekday').textContent=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][dt.getDay()];
+  const entry=loadEntry(year,month,day);
   document.getElementById('entryTitle').value=entry.title||'';
   document.getElementById('entryBody').value=entry.body||'';
   buildMoodRow(entry.mood||'');
 }
 
-// ── Save ─────────────────────────────────
+// Save / Clear
 document.getElementById('btnSave').addEventListener('click',()=>{
   const {year,month,day}=state;
   const title=document.getElementById('entryTitle').value.trim();
   const body=document.getElementById('entryBody').value.trim();
-  const mood=getSelectedMood();
-  if(!title&&!body){ toast('Nothing to save yet…'); return; }
-  save(year,month,day,{title,body,mood,saved:new Date().toISOString()});
-  buildDayList(document.getElementById('searchInput').value);
-  toast('Entry saved ✒️');
+  if(!title&&!body){toast('Nothing to save yet…');return;}
+  saveEntry(year,month,day,{title,body,mood:getSelectedMood(),saved:new Date().toISOString()});
+  buildDayList();toast('Entry saved ✒️');
 });
-
-// ── Clear ────────────────────────────────
 document.getElementById('btnDelete').addEventListener('click',()=>{
   document.getElementById('entryTitle').value='';
   document.getElementById('entryBody').value='';
   buildMoodRow('');
-  remove(state.year,state.month,state.day);
-  buildDayList(document.getElementById('searchInput').value);
-  toast('Entry cleared');
+  removeEntry(state.year,state.month,state.day);
+  buildDayList();toast('Entry cleared');
 });
-
-// ── Search ───────────────────────────────
-document.getElementById('searchInput').addEventListener('input', e=>{
-  buildDayList(e.target.value);
-});
-
-// ── Auto-save on blur ────────────────────
 ['entryTitle','entryBody'].forEach(id=>{
   document.getElementById(id).addEventListener('blur',()=>{
     const {year,month,day}=state;
     const title=document.getElementById('entryTitle').value.trim();
     const body=document.getElementById('entryBody').value.trim();
-    if(!title&&!body) return;
-    const mood=getSelectedMood();
-    save(year,month,day,{title,body,mood,saved:new Date().toISOString()});
-    buildDayList(document.getElementById('searchInput').value);
+    if(!title&&!body)return;
+    saveEntry(year,month,day,{title,body,mood:getSelectedMood(),saved:new Date().toISOString()});
+    buildDayList();
   });
 });
 
-// ── Init ─────────────────────────────────
-buildYearSelect();
-buildMonthGrid();
-buildDayList();
-renderPage();
+// Init
+buildYearSelect();buildMonthGrid();buildDayList();renderPage();
+showLock();
 
-// ── PWA: Register Service Worker ─────────
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
+// PWA
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
     navigator.serviceWorker.register('./sw.js')
-      .then(r => console.log('SW registered:', r.scope))
-      .catch(e => console.warn('SW failed:', e));
+      .then(r=>console.log('SW:',r.scope)).catch(e=>console.warn('SW fail:',e));
   });
 }
-
-// ── PWA: Install prompt ───────────────────
 let deferredPrompt;
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
-  setTimeout(() => { if (deferredPrompt) showInstallBanner(); }, 3000);
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();deferredPrompt=e;
+  setTimeout(()=>{if(deferredPrompt)showInstallBanner();},3000);
 });
-
-function showInstallBanner() {
-  if (document.getElementById('installBanner')) return;
-  const banner = document.createElement('div');
-  banner.id = 'installBanner';
-  banner.style.cssText = [
-    'position:fixed','bottom:24px','left:50%','transform:translateX(-50%)',
-    'background:#3d2b1a','border:1.5px solid #c9a84c','border-radius:12px',
-    'padding:14px 20px','display:flex','align-items:center','gap:14px',
-    "font-family:'Lora',serif",'font-size:0.82rem','color:#f5f0e8',
-    'box-shadow:0 8px 32px rgba(0,0,0,0.5)','z-index:999','max-width:92vw'
-  ].join(';');
-  banner.innerHTML =
-    '<span style="font-size:1.4rem">📖</span>' +
-    '<span>Install <strong style="color:#c9a84c">My Diary</strong> on your device?</span>' +
-    '<button id="btnInstall" style="background:#c9a84c;border:none;border-radius:6px;' +
-    "padding:7px 14px;color:#2a1a0a;font-family:'Lora',serif;font-size:0.78rem;" +
-    'cursor:pointer;font-weight:600;">Install</button>' +
-    '<button id="btnDismiss" style="background:transparent;border:none;' +
-    'color:rgba(245,240,232,0.4);font-size:1.1rem;cursor:pointer;padding:0 4px;">✕</button>';
-  document.body.appendChild(banner);
-
-  document.getElementById('btnInstall').addEventListener('click', async () => {
-    banner.remove();
-    if (!deferredPrompt) return;
+function showInstallBanner(){
+  if(document.getElementById('installBanner'))return;
+  const b=document.createElement('div');b.id='installBanner';
+  b.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#3d2b1a;border:1.5px solid #c9a84c;border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:14px;font-family:Lora,serif;font-size:0.82rem;color:#f5f0e8;box-shadow:0 8px 32px rgba(0,0,0,0.5);z-index:998;max-width:92vw';
+  b.innerHTML='<span style="font-size:1.4rem">📖</span><span>Install <strong style="color:#c9a84c">My Diary</strong>?</span><button id="btnInstall" style="background:#c9a84c;border:none;border-radius:6px;padding:7px 14px;color:#2a1a0a;font-family:Lora,serif;font-size:0.78rem;cursor:pointer;font-weight:600">Install</button><button id="btnDismiss" style="background:transparent;border:none;color:rgba(245,240,232,0.4);font-size:1.1rem;cursor:pointer;padding:0 4px">✕</button>';
+  document.body.appendChild(b);
+  document.getElementById('btnInstall').addEventListener('click',async()=>{
+    b.remove();if(!deferredPrompt)return;
     deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    deferredPrompt = null;
-    if (outcome === 'accepted') toast('App installed! 🎉');
+    const{outcome}=await deferredPrompt.userChoice;
+    deferredPrompt=null;if(outcome==='accepted')toast('Installed! 🎉');
   });
-  document.getElementById('btnDismiss').addEventListener('click', () => banner.remove());
+  document.getElementById('btnDismiss').addEventListener('click',()=>b.remove());
 }
-
-window.addEventListener('appinstalled', () => {
-  toast('My Diary installed! 🎉');
-  deferredPrompt = null;
-});
+window.addEventListener('appinstalled',()=>{toast('My Diary installed! 🎉');deferredPrompt=null;});
 </script>
 </body>
 </html>
