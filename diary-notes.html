@@ -28,42 +28,12 @@
     align-items: center; padding: 20px 10px 40px;
   }
 
-  /* ── Lock Screen ── */
-  #lockScreen {
-    position: fixed; inset: 0; background: #1a0f05;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    z-index: 9999; gap: 16px; padding: 24px;
-  }
-  .lock-icon { font-size: 3.5rem; }
-  .lock-title { font-family:'Playfair Display',serif; font-style:italic; font-size:2rem; color:var(--gold); letter-spacing:2px; }
-  .lock-sub { font-size:0.78rem; color:rgba(201,168,76,0.4); letter-spacing:3px; text-transform:uppercase; }
-  .lock-input {
-    background:rgba(255,255,255,0.06); border:1.5px solid rgba(201,168,76,0.4);
-    border-radius:8px; color:var(--gold); font-family:'Lora',serif;
-    font-size:1.1rem; padding:12px 18px; outline:none;
-    width:100%; max-width:300px; text-align:center; letter-spacing:4px;
-    transition: border-color 0.2s;
-  }
-  .lock-input::placeholder { letter-spacing:1px; color:rgba(201,168,76,0.3); font-size:0.85rem; }
-  .lock-input:focus { border-color: var(--gold); }
-  .lock-btn {
-    background:var(--gold); border:none; border-radius:8px;
-    color:#2a1a0a; font-family:'Playfair Display',serif;
-    font-size:0.95rem; font-weight:600; padding:12px 36px;
-    cursor:pointer; letter-spacing:1px; transition:all 0.2s;
-    width:100%; max-width:300px;
-  }
-  .lock-btn:hover { background:#e0bc5a; }
-  .lock-error { color:var(--red-ribbon); font-size:0.78rem; min-height:18px; letter-spacing:0.5px; }
-  .lock-hint { font-size:0.72rem; color:rgba(201,168,76,0.35); text-align:center; max-width:280px; line-height:1.7; white-space:pre-line; }
-  @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)} }
-  .shake { animation: shake 0.4s ease; }
+  
 
   /* ── Header ── */
   .app-header { display:flex; align-items:center; justify-content:center; gap:14px; width:100%; max-width:960px; margin-bottom:6px; position:relative; }
   .app-title { font-family:'Playfair Display',serif; font-style:italic; font-size:clamp(2rem,6vw,3.2rem); color:var(--gold); text-align:center; letter-spacing:2px; text-shadow:0 2px 12px rgba(201,168,76,0.3); }
-  .btn-lock-app { position:absolute; right:0; background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3); border-radius:8px; color:var(--gold); font-size:1.1rem; width:38px; height:38px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+  
   .btn-lock-app:hover { background:rgba(201,168,76,0.22); }
   .app-subtitle { font-family:'Lora',serif; font-size:0.82rem; color:rgba(201,168,76,0.55); text-align:center; letter-spacing:4px; text-transform:uppercase; margin-bottom:28px; }
 
@@ -131,18 +101,7 @@
   .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--dark-brown); color:var(--gold); font-family:'Lora',serif; font-size:0.82rem; padding:10px 24px; border-radius:20px; opacity:0; pointer-events:none; transition:all 0.35s; z-index:100; white-space:nowrap; }
   .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-  /* Change Password Modal */
-  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:888; align-items:center; justify-content:center; }
-  .modal-overlay.open { display:flex; }
-  .modal { background:#3d2b1a; border:1.5px solid var(--gold); border-radius:14px; padding:28px 28px 22px; width:90%; max-width:340px; display:flex; flex-direction:column; gap:14px; }
-  .modal-title { font-family:'Playfair Display',serif; font-style:italic; color:var(--gold); font-size:1.2rem; }
-  .modal-input { background:rgba(255,255,255,0.07); border:1px solid rgba(201,168,76,0.35); border-radius:6px; color:var(--gold); font-family:'Lora',serif; font-size:0.9rem; padding:10px 14px; outline:none; width:100%; }
-  .modal-input::placeholder { color:rgba(201,168,76,0.3); }
-  .modal-actions { display:flex; gap:10px; justify-content:flex-end; }
-  .modal-btn { font-family:'Lora',serif; font-size:0.8rem; padding:8px 18px; border-radius:6px; cursor:pointer; border:none; }
-  .modal-btn-cancel { background:transparent; border:1px solid rgba(201,168,76,0.3); color:rgba(201,168,76,0.6); }
-  .modal-btn-save { background:var(--gold); color:#2a1a0a; font-weight:600; }
-  .modal-err { color:var(--red-ribbon); font-size:0.75rem; min-height:16px; }
+  
 
   /* Responsive */
   @media (max-width:680px) {
@@ -156,22 +115,8 @@
 </head>
 <body>
 
-<!-- Lock Screen -->
-<div id="lockScreen">
-  <div class="lock-icon">🔒</div>
-  <div class="lock-title">My Diary</div>
-  <div class="lock-sub">Private &amp; Secure</div>
-  <input class="lock-input" type="password" id="lockInput" placeholder="Enter your password" maxlength="32" />
-  <div class="lock-error" id="lockError"></div>
-  <button class="lock-btn" id="lockSubmit">Open Diary</button>
-  <div class="lock-hint" id="lockHint"></div>
-  <button id="btnResetPw" style="margin-top:8px;background:transparent;border:none;color:rgba(192,57,43,0.5);font-family:'Lora',serif;font-size:0.7rem;cursor:pointer;text-decoration:underline;letter-spacing:0.5px;">Forgot password? Reset to default</button>
 </div>
 
-<!-- Change Password Modal -->
-<div class="modal-overlay" id="pwModal">
-  <div class="modal">
-    <div class="modal-title">🔑 Change Password</div>
     <input class="modal-input" type="password" id="pwOld" placeholder="Current password" />
     <input class="modal-input" type="password" id="pwNew" placeholder="New password (min 4 chars)" />
     <input class="modal-input" type="password" id="pwConfirm" placeholder="Confirm new password" />
@@ -186,7 +131,6 @@
 <!-- App -->
 <div class="app-header">
   <div class="app-title">My Diary</div>
-  <button class="btn-lock-app" id="btnLockApp" title="Lock diary">🔒</button>
 </div>
 <div class="app-subtitle">Every day, a new page</div>
 
@@ -219,7 +163,6 @@
     <div style="margin-top:auto;padding-top:10px;border-top:1px solid rgba(201,168,76,0.15);display:flex;flex-direction:column;gap:7px;">
       <button id="btnExport" style="background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.35);border-radius:6px;color:rgba(201,168,76,0.85);font-family:'Lora',serif;font-size:0.72rem;padding:8px 12px;cursor:pointer;width:100%;transition:all 0.2s;text-align:left;">📦 Export Diary (ZIP)</button>
       <label style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:6px;color:rgba(201,168,76,0.6);font-family:'Lora',serif;font-size:0.72rem;padding:8px 12px;cursor:pointer;width:100%;transition:all 0.2s;text-align:left;display:block;">📥 Import Diary (ZIP)<input type="file" id="btnImport" accept=".zip" style="display:none"/></label>
-      <button id="btnChangePw" style="background:transparent;border:1px solid rgba(201,168,76,0.18);border-radius:6px;color:rgba(201,168,76,0.45);font-family:'Lora',serif;font-size:0.72rem;padding:7px 12px;cursor:pointer;width:100%;transition:all 0.2s;text-align:left;">🔑 Change Password</button>
     </div>
     <!-- Import confirm modal -->
     <div class="modal-overlay" id="importModal">
@@ -263,69 +206,6 @@
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAYS_SHORT=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const MOODS=['😊 Happy','😔 Sad','😤 Frustrated','😌 Peaceful','🥳 Excited','🤔 Thoughtful','😴 Tired','❤️ Grateful'];
-const PW_KEY='diary-password';
-const DEFAULT_PW='diary123';
-
-let state={year:new Date().getFullYear(),month:new Date().getMonth(),day:new Date().getDate()};
-let searchScope='month';
-
-// ── Password system ──────────────────────
-// Always force-write default on first load if stored value is not a plain string password
-function initPw(){
-  const stored = localStorage.getItem(PW_KEY);
-  // If nothing stored, or stored value looks like old hash (long hex or base64), reset to default
-  const looksLikeHash = !stored || stored.length > 40 || stored.includes('=');
-  if(looksLikeHash) localStorage.setItem(PW_KEY, DEFAULT_PW);
-}
-function checkPw(pw){ return pw.trim() === localStorage.getItem(PW_KEY); }
-function setPw(pw){ localStorage.setItem(PW_KEY, pw); }
-
-// Lock screen
-function showLock(){
-  document.getElementById('lockScreen').style.display='flex';
-  document.getElementById('lockInput').value='';
-  document.getElementById('lockError').textContent='';
-  document.getElementById('lockHint').textContent='Default password is: diary123';
-  setTimeout(()=>document.getElementById('lockInput').focus(), 100);
-}
-function tryUnlock(){
-  const pw=document.getElementById('lockInput').value;
-  if(!pw){ document.getElementById('lockError').textContent='Please enter your password.'; return; }
-  if(checkPw(pw)){
-    document.getElementById('lockScreen').style.display='none';
-    document.getElementById('lockError').textContent='';
-  } else {
-    document.getElementById('lockError').textContent='❌ Wrong password. Try again.';
-    const inp=document.getElementById('lockInput');
-    inp.classList.add('shake'); inp.value='';
-    setTimeout(()=>inp.classList.remove('shake'),500);
-  }
-}
-document.getElementById('lockSubmit').addEventListener('click', tryUnlock);
-document.getElementById('lockInput').addEventListener('keydown', e=>{ if(e.key==='Enter') tryUnlock(); });
-document.getElementById('btnLockApp').addEventListener('click', showLock);
-
-// Change password modal
-document.getElementById('btnChangePw').addEventListener('click',()=>{
-  ['pwOld','pwNew','pwConfirm'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('pwErr').textContent='';
-  document.getElementById('pwModal').classList.add('open');
-});
-document.getElementById('pwCancel').addEventListener('click',()=>document.getElementById('pwModal').classList.remove('open'));
-document.getElementById('pwSave').addEventListener('click',()=>{
-  const old=document.getElementById('pwOld').value;
-  const nw=document.getElementById('pwNew').value;
-  const cf=document.getElementById('pwConfirm').value;
-  const err=document.getElementById('pwErr');
-  if(!old||!nw||!cf){ err.textContent='Please fill in all fields.'; return; }
-  if(nw.length<4){ err.textContent='New password must be at least 4 characters.'; return; }
-  if(nw!==cf){ err.textContent='New passwords do not match.'; return; }
-  if(!checkPw(old)){ err.textContent='❌ Current password is wrong.'; return; }
-  setPw(nw);
-  document.getElementById('pwModal').classList.remove('open');
-  toast('Password updated! 🔑');
-});
-
 // Storage
 function key(y,m,d){return `diary-${y}-${m+1}-${d}`;}
 function loadEntry(y,m,d){try{return JSON.parse(localStorage.getItem(key(y,m,d)))||{};}catch{return {};}}
@@ -662,19 +542,10 @@ document.getElementById('importConfirm').addEventListener('click', () => {
 document.getElementById('btnExport').addEventListener('click', exportDiary);
 
 // Init
-initPw();
 buildYearSelect();buildMonthGrid();buildDayList();renderPage();
 showLock();
 
 // Reset password button
-document.getElementById('btnResetPw').addEventListener('click',()=>{
-  if(confirm('This will reset your password to: diary123\n\nYour diary entries will NOT be deleted.\n\nContinue?')){
-    localStorage.setItem(PW_KEY, 'diary123');
-    document.getElementById('lockInput').value='diary123';
-    document.getElementById('lockError').textContent='';
-    document.getElementById('lockHint').textContent='✅ Password is now: diary123 — press Open Diary!';
-  }
-});
 
 // PWA
 if('serviceWorker' in navigator){
