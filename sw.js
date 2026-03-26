@@ -1,4 +1,4 @@
-const CACHE = 'my-diary-v8';
+const CACHE = 'my-diary-v10';
 const ASSETS = [
   './diary-notes.html',
   './manifest.json',
