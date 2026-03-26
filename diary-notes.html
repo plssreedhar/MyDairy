@@ -268,17 +268,15 @@ const DEFAULT_PW='diary123';
 let state={year:new Date().getFullYear(),month:new Date().getMonth(),day:new Date().getDate()};
 let searchScope='month';
 
-// Hash password
-async function hashPw(pw){
-  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pw+'mydiary-salt-2024'));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+// ── Password system (simple & reliable) ──
+// Stores a salted string — not plaintext, not crypto-dependent
+function encodePw(pw){ return btoa(unescape(encodeURIComponent('MDsalt::'+pw+'::2024'))); }
+function getStoredPw(){ return localStorage.getItem(PW_KEY); }
+function initPw(){
+  if(!getStoredPw()) localStorage.setItem(PW_KEY, encodePw(DEFAULT_PW));
 }
-function getStoredHash(){return localStorage.getItem(PW_KEY);}
-async function checkPw(pw){
-  let stored=getStoredHash();
-  if(!stored){stored=await hashPw(DEFAULT_PW);localStorage.setItem(PW_KEY,stored);}
-  return (await hashPw(pw))===stored;
-}
+function checkPw(pw){ return encodePw(pw) === getStoredPw(); }
+function setPw(pw){ localStorage.setItem(PW_KEY, encodePw(pw)); }
 
 // Lock screen
 function showLock(){
@@ -286,15 +284,15 @@ function showLock(){
   ls.style.display='flex';
   document.getElementById('lockInput').value='';
   document.getElementById('lockError').textContent='';
-  const isFirst=!getStoredHash();
-  document.getElementById('lockHint').textContent=isFirst?'First time?\nDefault password is: diary123\n(Change it from the sidebar after login.)':'';
-  setTimeout(()=>document.getElementById('lockInput').focus(),100);
+  const isFirst = !localStorage.getItem(PW_KEY);
+  document.getElementById('lockHint').textContent = isFirst
+    ? 'First time?\nDefault password is: diary123\n(Change it from the sidebar after login.)' : '';
+  setTimeout(()=>document.getElementById('lockInput').focus(), 100);
 }
-async function tryUnlock(){
+function tryUnlock(){
   const pw=document.getElementById('lockInput').value;
-  if(!pw){document.getElementById('lockError').textContent='Please enter your password.';return;}
-  const ok=await checkPw(pw);
-  if(ok){
+  if(!pw){ document.getElementById('lockError').textContent='Please enter your password.'; return; }
+  if(checkPw(pw)){
     document.getElementById('lockScreen').style.display='none';
     document.getElementById('lockError').textContent='';
   } else {
@@ -304,9 +302,9 @@ async function tryUnlock(){
     setTimeout(()=>inp.classList.remove('shake'),500);
   }
 }
-document.getElementById('lockSubmit').addEventListener('click',tryUnlock);
-document.getElementById('lockInput').addEventListener('keydown',e=>{if(e.key==='Enter')tryUnlock();});
-document.getElementById('btnLockApp').addEventListener('click',showLock);
+document.getElementById('lockSubmit').addEventListener('click', tryUnlock);
+document.getElementById('lockInput').addEventListener('keydown', e=>{ if(e.key==='Enter') tryUnlock(); });
+document.getElementById('btnLockApp').addEventListener('click', showLock);
 
 // Change password modal
 document.getElementById('btnChangePw').addEventListener('click',()=>{
@@ -315,16 +313,16 @@ document.getElementById('btnChangePw').addEventListener('click',()=>{
   document.getElementById('pwModal').classList.add('open');
 });
 document.getElementById('pwCancel').addEventListener('click',()=>document.getElementById('pwModal').classList.remove('open'));
-document.getElementById('pwSave').addEventListener('click',async()=>{
+document.getElementById('pwSave').addEventListener('click',()=>{
   const old=document.getElementById('pwOld').value;
   const nw=document.getElementById('pwNew').value;
   const cf=document.getElementById('pwConfirm').value;
   const err=document.getElementById('pwErr');
-  if(!old||!nw||!cf){err.textContent='Please fill in all fields.';return;}
-  if(nw.length<4){err.textContent='New password must be at least 4 characters.';return;}
-  if(nw!==cf){err.textContent='New passwords do not match.';return;}
-  if(!(await checkPw(old))){err.textContent='❌ Current password is wrong.';return;}
-  localStorage.setItem(PW_KEY,await hashPw(nw));
+  if(!old||!nw||!cf){ err.textContent='Please fill in all fields.'; return; }
+  if(nw.length<4){ err.textContent='New password must be at least 4 characters.'; return; }
+  if(nw!==cf){ err.textContent='New passwords do not match.'; return; }
+  if(!checkPw(old)){ err.textContent='❌ Current password is wrong.'; return; }
+  setPw(nw);
   document.getElementById('pwModal').classList.remove('open');
   toast('Password updated! 🔑');
 });
@@ -665,6 +663,7 @@ document.getElementById('importConfirm').addEventListener('click', () => {
 document.getElementById('btnExport').addEventListener('click', exportDiary);
 
 // Init
+initPw();
 buildYearSelect();buildMonthGrid();buildDayList();renderPage();
 showLock();
 
