@@ -269,18 +269,20 @@ const DEFAULT_PW='diary123';
 let state={year:new Date().getFullYear(),month:new Date().getMonth(),day:new Date().getDate()};
 let searchScope='month';
 
-// ── Password system (simple & bulletproof) ──
-function getStoredPw(){ return localStorage.getItem(PW_KEY); }
+// ── Password system ──────────────────────
+// Always force-write default on first load if stored value is not a plain string password
 function initPw(){
-  if(!getStoredPw()) localStorage.setItem(PW_KEY, DEFAULT_PW);
+  const stored = localStorage.getItem(PW_KEY);
+  // If nothing stored, or stored value looks like old hash (long hex or base64), reset to default
+  const looksLikeHash = !stored || stored.length > 40 || stored.includes('=');
+  if(looksLikeHash) localStorage.setItem(PW_KEY, DEFAULT_PW);
 }
-function checkPw(pw){ return pw === getStoredPw(); }
+function checkPw(pw){ return pw.trim() === localStorage.getItem(PW_KEY); }
 function setPw(pw){ localStorage.setItem(PW_KEY, pw); }
 
 // Lock screen
 function showLock(){
-  const ls=document.getElementById('lockScreen');
-  ls.style.display='flex';
+  document.getElementById('lockScreen').style.display='flex';
   document.getElementById('lockInput').value='';
   document.getElementById('lockError').textContent='';
   document.getElementById('lockHint').textContent='Default password is: diary123';
@@ -667,10 +669,10 @@ showLock();
 // Reset password button
 document.getElementById('btnResetPw').addEventListener('click',()=>{
   if(confirm('This will reset your password to: diary123\n\nYour diary entries will NOT be deleted.\n\nContinue?')){
-    localStorage.setItem(PW_KEY, DEFAULT_PW);
+    localStorage.setItem(PW_KEY, 'diary123');
     document.getElementById('lockInput').value='diary123';
     document.getElementById('lockError').textContent='';
-    document.getElementById('lockHint').textContent='✅ Reset done! Password is: diary123';
+    document.getElementById('lockHint').textContent='✅ Password is now: diary123 — press Open Diary!';
   }
 });
 
