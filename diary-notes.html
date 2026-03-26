@@ -165,6 +165,7 @@
   <div class="lock-error" id="lockError"></div>
   <button class="lock-btn" id="lockSubmit">Open Diary</button>
   <div class="lock-hint" id="lockHint"></div>
+  <button id="btnResetPw" style="margin-top:8px;background:transparent;border:none;color:rgba(192,57,43,0.5);font-family:'Lora',serif;font-size:0.7rem;cursor:pointer;text-decoration:underline;letter-spacing:0.5px;">Forgot password? Reset to default</button>
 </div>
 
 <!-- Change Password Modal -->
@@ -284,9 +285,7 @@ function showLock(){
   ls.style.display='flex';
   document.getElementById('lockInput').value='';
   document.getElementById('lockError').textContent='';
-  const isFirst = !localStorage.getItem(PW_KEY);
-  document.getElementById('lockHint').textContent = isFirst
-    ? 'First time?\nDefault password is: diary123\n(Change it from the sidebar after login.)' : '';
+  document.getElementById('lockHint').textContent='Default password is: diary123';
   setTimeout(()=>document.getElementById('lockInput').focus(), 100);
 }
 function tryUnlock(){
@@ -666,6 +665,18 @@ document.getElementById('btnExport').addEventListener('click', exportDiary);
 initPw();
 buildYearSelect();buildMonthGrid();buildDayList();renderPage();
 showLock();
+
+// Reset password button
+document.getElementById('btnResetPw').addEventListener('click',()=>{
+  if(confirm('This will reset your password to: diary123\n\nYour diary entries will NOT be deleted.\n\nContinue?')){
+    localStorage.removeItem(PW_KEY);
+    initPw();
+    document.getElementById('lockInput').value='';
+    document.getElementById('lockError').textContent='';
+    document.getElementById('lockHint').textContent='Password reset!\nDefault password is: diary123';
+    toast('Password reset to: diary123');
+  }
+});
 
 // PWA
 if('serviceWorker' in navigator){
